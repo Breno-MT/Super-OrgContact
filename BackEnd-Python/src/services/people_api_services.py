@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 import os.path
+import requests
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -67,9 +68,7 @@ def people_api_all_person_connection():
 
     try:
         service = build('people', 'v1', credentials=creds)
-        name_array = []
-
-        # Call the People API
+        people_information = []
 
         results = service.people().connections().list(
             resourceName='people/me',
@@ -77,12 +76,26 @@ def people_api_all_person_connection():
         connections = results.get('connections', [])
 
         for person in connections:
+
+            people_person_contacts = {
+                "name": "",
+                "email": ""
+            }
+
             names = person.get('names', [])
+            emails = person.get("emailAddresses", [])
+
             if names:
                 name = names[0].get('displayName')
-                name_array.append(name)
-        
-        return name_array
+                people_person_contacts["name"] = name
+
+            if emails:
+                email = emails[0].get("value")
+                people_person_contacts["email"] = email
+
+            people_information.append(people_person_contacts)
+
+        return people_information
                     
     except HttpError as err:
         print(err)
