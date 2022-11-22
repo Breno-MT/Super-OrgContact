@@ -24,7 +24,20 @@ def callback_google():
         audience=current_app.config['GOOGLE_CLIENT_ID']
     )
 
-    create_oauth_user(user_google_dict["email"])
+    found_email = mongo_client.users.find_one({"email": user_google_dict["email"]})
+
+    if found_email == None:
+
+        create_oauth_user(user_google_dict["email"])
+
+        session["google_id"] = user_google_dict.get("sub")
+
+        del user_google_dict['aud']
+        del user_google_dict['azp']
+
+        token = generate_jwt(user_google_dict)
+
+        return redirect(f"{current_app.config['FRONTEND_URL']}?jwt={token}")
 
     session["google_id"] = user_google_dict.get("sub")
 
@@ -33,10 +46,7 @@ def callback_google():
 
     token = generate_jwt(user_google_dict)
 
-    print(token)
-
     return redirect(f"{current_app.config['FRONTEND_URL']}?jwt={token}")
-
 
 flow = Flow.from_client_secrets_file(
     client_secrets_file="src/database/client_secret.json",
