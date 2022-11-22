@@ -18,7 +18,7 @@ users_validator = {
                 "description": "Senha do usuário",
             },
             "domain": {
-                "bsonType": "objectId",
+                "bsonType": "string",
                 "description": "Vinculo da domain gmail",
             },
         },
