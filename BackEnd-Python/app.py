@@ -6,7 +6,7 @@ from src.models.users import create_collection_users
 
 routes(app=app)
 
-@click.command(name="create_collections")
+@click.command(name="create_collection")
 @with_appcontext
 def command_collection():
     create_collection_users(mongo_client)
