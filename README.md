@@ -20,3 +20,17 @@ python -m pip install -r requirements.txt
 ```
 flask create_collection
 ```
+### Crie uma pasta na src/ chamada database, e adicione o credentials.json, client_secret.json do Google.
+- Obs: para pegar ambos arquivos, vá no API & Services do Google e configure lá corretamente conforme a imagem abaixo:
+https://imgur.com/a/lhNfdHi
+
+### Depois de configurado tudo perfeitamente, rode o comando abaixo:
+```
+flask run
+```
+
+### Endpoints
+- Contacts: contacts/people_api/v1/get_all_connections, Método GET
+- Contacts: contacts/people_api/v1/list_10_connections, Método GET
+- Users: users/auth/google, Método POST
+- Users: users/callback, Método GET
