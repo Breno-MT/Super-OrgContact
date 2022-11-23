@@ -34,3 +34,6 @@ flask run
 - Contacts: contacts/people_api/v1/list_10_connections, Método GET
 - Users: users/auth/google, Método POST
 - Users: users/callback, Método GET
+
+# Sobre mim
+- Sou um Dev. Fullstack em busca de conhecimento, melhorar minhas capacidades tanto como pessoa mas como programador, sempre aprender com erros e jamais desistir.
