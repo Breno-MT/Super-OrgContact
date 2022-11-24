@@ -9,6 +9,7 @@ from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
 from src import mongo_client
 from src.utils import generate_jwt
+from src.services.user_services import create_oauth_user
 
 def callback_google():
 
@@ -23,6 +24,21 @@ def callback_google():
         audience=current_app.config['GOOGLE_CLIENT_ID']
     )
 
+    found_email = mongo_client.users.find_one({"email": user_google_dict["email"]})
+
+    if found_email == None:
+
+        create_oauth_user(user_google_dict["email"])
+
+        session["google_id"] = user_google_dict.get("sub")
+
+        del user_google_dict['aud']
+        del user_google_dict['azp']
+
+        token = generate_jwt(user_google_dict)
+
+        return redirect(f"{current_app.config['FRONTEND_URL']}?jwt={token}")
+
     session["google_id"] = user_google_dict.get("sub")
 
     del user_google_dict['aud']
@@ -30,31 +46,15 @@ def callback_google():
 
     token = generate_jwt(user_google_dict)
 
-    print(token)
-
     return redirect(f"{current_app.config['FRONTEND_URL']}?jwt={token}")
-
 
 flow = Flow.from_client_secrets_file(
     client_secrets_file="src/database/client_secret.json",
     scopes=[
-        "https://www.googleapis.com/auth/contacts.readonly",
+        "https://www.googleapis.com/auth/userinfo.email",
         "https://www.googleapis.com/auth/userinfo.profile",
+        "https://www.googleapis.com/auth/contacts.readonly",
         "openid"
     ],
     redirect_uri = "http://localhost:5000/users/callback"
 )
-
-def password_generator(): 
-    letters = "abcdefghijklmnopqrstuvwxyzABCEFGHIJKLMNOPQRSTUVWXYZ123456789"
-    caracter = '!@#$%&^*-_'
-
-    password = ""
-
-    for i in range(0, 1):
-        password_caracter = random.choice(caracter)
-        password += password_caracter
-        for h in range(0, 14):
-            password_letters = random.choice(letters)
-            password += password_letters
-    return password

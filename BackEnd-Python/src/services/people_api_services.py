@@ -32,6 +32,12 @@ def people_api_paginate_10():
         service = build('people', 'v1', credentials=creds)
         name_array = []
 
+        people_information = {
+            "name": "",
+            "email": "",
+            "phone": ""
+        }
+
         # Call the People API
 
         results = service.people().connections().list(
@@ -42,9 +48,17 @@ def people_api_paginate_10():
 
         for person in connections:
             names = person.get('names', [])
+            emails = person.get("emailAddresses", [])
+
             if names:
                 name = names[0].get('displayName')
-                name_array.append(name)
+                people_information["name"] = name
+            
+            if emails:
+                email = emails[0].get("value")
+                people_information["email"] = email
+            
+            
         
         return name_array
                     
@@ -70,6 +84,9 @@ def people_api_all_person_connection():
         service = build('people', 'v1', credentials=creds)
         people_information = []
 
+        people_domain_conectanuvem = []
+        people_domain_gmail = []
+
         results = service.people().connections().list(
             resourceName='people/me',
             personFields='names,emailAddresses').execute()
@@ -78,6 +95,7 @@ def people_api_all_person_connection():
         for person in connections:
 
             people_person_contacts = {
+                "domain": "",
                 "name": "",
                 "email": ""
             }
@@ -92,10 +110,23 @@ def people_api_all_person_connection():
             if emails:
                 email = emails[0].get("value")
                 people_person_contacts["email"] = email
+                
+                if "@conectanuvem" in email:
+                    people_person_contacts["domain"] = "ConectaNuvem"
+                    people_person_contacts["name"] = name
+                    people_person_contacts["email"] = email
+                    people_domain_conectanuvem.append(people_person_contacts)
+
+                if "@gmail" in email:
+                    people_person_contacts["domain"] = "Gmail"
+                    people_person_contacts["name"] = name
+                    people_person_contacts["email"] = email
+                    people_domain_gmail.append(people_person_contacts)
+
 
             people_information.append(people_person_contacts)
 
-        return people_information
+        return people_domain_conectanuvem, people_domain_gmail, people_information
                     
     except HttpError as err:
         print(err)
