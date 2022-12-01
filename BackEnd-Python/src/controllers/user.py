@@ -9,7 +9,7 @@ from src import mongo_client
 
 users = Blueprint("users", __name__, url_prefix="/users")
 
-@users.route("/get_domain_gmail", methods=["GET"])
+@users.route("/get_domain_conecta", methods=["GET"])
 def get_domain_conecta_nuvem():
 
     response = mongo_client.users.aggregate([
@@ -71,5 +71,4 @@ def auth_google():
     )
 
 @users.route("/callback", methods=["GET"])
-def callback():
-    return callback_google()
+def callback(): return callback_google()
