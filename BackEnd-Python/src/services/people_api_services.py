@@ -15,7 +15,7 @@ SCOPES = ['https://www.googleapis.com/auth/contacts.readonly']
 
 def people_api_paginate_10():
     """
-    Return the name(s) of the first 10 connections.
+    Get all the 10 persons information in a person connection
     """
     creds = None
     
@@ -30,15 +30,10 @@ def people_api_paginate_10():
 
     try:
         service = build('people', 'v1', credentials=creds)
-        name_array = []
+        people_information = []
 
-        people_information = {
-            "name": "",
-            "email": "",
-            "phone": ""
-        }
-
-        # Call the People API
+        people_domain_conectanuvem = []
+        people_domain_gmail = []
 
         results = service.people().connections().list(
             resourceName='people/me',
@@ -47,23 +42,44 @@ def people_api_paginate_10():
         connections = results.get('connections', [])
 
         for person in connections:
+
+            people_person_contacts = {
+                "domain": "",
+                "name": "",
+                "email": ""
+            }
+
             names = person.get('names', [])
             emails = person.get("emailAddresses", [])
 
             if names:
                 name = names[0].get('displayName')
-                people_information["name"] = name
-            
+                people_person_contacts["name"] = name
+
             if emails:
                 email = emails[0].get("value")
-                people_information["email"] = email
-            
-            
-        
-        return name_array
+                people_person_contacts["email"] = email
+                
+                if "@conectanuvem" in email:
+                    people_person_contacts["domain"] = "ConectaNuvem"
+                    people_person_contacts["name"] = name
+                    people_person_contacts["email"] = email
+                    people_domain_conectanuvem.append(people_person_contacts)
+
+                if "@gmail" in email:
+                    people_person_contacts["domain"] = "Gmail"
+                    people_person_contacts["name"] = name
+                    people_person_contacts["email"] = email
+                    people_domain_gmail.append(people_person_contacts)
+
+
+            people_information.append(people_person_contacts)
+
+        return people_domain_conectanuvem, people_domain_gmail, people_information
                     
     except HttpError as err:
         print(err)
+
 
 def people_api_all_person_connection():
     """
